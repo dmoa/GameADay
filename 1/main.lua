@@ -89,6 +89,7 @@ function love.update(dt)
         pipes:Update(dt)
         player:Update(dt)
         scroll_speed = scroll_speed + dt / 5
+        score = 0
     end
 
     if score > highscore then
