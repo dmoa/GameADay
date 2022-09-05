@@ -59,6 +59,9 @@ player = require "Player"
 alphnum = "abcdefghijklmnopqrstuvwxyz0123456789"
 lineup = {"a", "b", "c"}
 
+score = 0
+highscore = 0
+
 jump_sound = la.newSource("jump.wav", "static")
 die_sound = la.newSource("die.wav", "static")
 
@@ -72,8 +75,9 @@ function love.draw()
     if not playing then
         lg.print(tostring(lineup[1]).." to Play")
     else
-        lg.print(tostring(lineup[1]).."\n"..tostring(lineup[2]).."\n"..tostring(lineup[3]))
+        lg.print("score: "..tostring(score).."\n".."highscore: "..tostring(highscore).."\n\n "..tostring(lineup[1]).."\n "..tostring(lineup[2]).."\n "..tostring(lineup[3]))
     end
+
 
     push:finish()
 end
@@ -84,6 +88,11 @@ function love.update(dt)
         bg:Update(dt)
         pipes:Update(dt)
         player:Update(dt)
+        scroll_speed = scroll_speed + dt / 5
+    end
+
+    if score > highscore then
+        highscore = score
     end
 end
 
@@ -91,6 +100,7 @@ function restart()
     playing = true
     player:Reset()
     pipes:Reset()
+    scroll_speed = 50
 end
 
 

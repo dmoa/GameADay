@@ -16,15 +16,19 @@ end
 
 function Pipes:Update(dt)
     for i = 1, #self.positions do
+        self.positions[i][1][3] = self.positions[i][1][1]
+        self.positions[i][2][3] = self.positions[i][2][1]
         self.positions[i][1][1] = self.positions[i][1][1] - scroll_speed * dt
         self.positions[i][2][1] = self.positions[i][2][1] - scroll_speed * dt
 
         if self.positions[i][1][1] < - 50 then
             local random_number = love.math.random(10, 140)
-            self.positions[i][1][1] = 15 * self.hgap
-            self.positions[i][2][1] = 15 * self.hgap
+            self.positions[i][1][1] = #self.positions * self.hgap
+            self.positions[i][2][1] = #self.positions * self.hgap
             self.positions[i][1][2] = random_number - self.image_down:getHeight()
             self.positions[i][2][2] = random_number + Pipes.vgap
+            self.positions[i][1][3] = self.positions[i][1][1]
+            self.positions[i][2][3] = self.positions[i][2][1]
         end
 
         if AABB(self.positions[i][1][1] + self.buffer, self.positions[i][1][2], self.image_down:getWidth(), self.image_down:getHeight(), player.x, player.y, player.image:getWidth(), player.image:getHeight()) or AABB(self.positions[i][2][1] + self.buffer, self.positions[i][2][2], self.image_up:getWidth(), self.image_up:getHeight(), player.x, player.y, player.image:getWidth(), player.image:getHeight()) then
@@ -32,14 +36,18 @@ function Pipes:Update(dt)
             die_sound:play()
         end
 
+        if self.positions[i][1][3] > player.x and self.positions[i][1][1] < player.x then
+            score = score + 1
+        end
+
     end
 end
 
 function Pipes:Reset()
     self.positions = {}
-    for i = 1, 10 do
+    for i = 1, 5 do
         local random_number = love.math.random(10, 140)
-        table.insert(self.positions, { {i * self.hgap, random_number - self.image_down:getHeight()}, {i * self.hgap, random_number + self.vgap} })
+        table.insert(self.positions, { {i * self.hgap, random_number - self.image_down:getHeight()}, {i * self.hgap, random_number + self.vgap, 0} })
     end
 end
 
