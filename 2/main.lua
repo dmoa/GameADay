@@ -114,8 +114,8 @@ end
 function love.keypressed(key)
     if key == "escape" then le.quit() end
     if key == "return" and lk.isDown("lalt") then push:switchFullscreen() end
+    if playing then blobs:KeyPressed(key) end
     if key == "space" and (playing == false) then restart() end
-    blobs:KeyPressed(key)
 end
 
 function love.resize(w, h)
