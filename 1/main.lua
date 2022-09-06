@@ -73,7 +73,7 @@ function love.draw()
     pipes:Draw()
     player:Draw()
     if not playing then
-        lg.print(tostring(lineup[1]).." to Play")
+        lg.print(tostring(lineup[1]).." to Play".."\nscore: "..tostring(score).."\n".."highscore: "..tostring(highscore))
     else
         lg.print("score: "..tostring(score).."\n".."highscore: "..tostring(highscore).."\n\n "..tostring(lineup[1]).."\n "..tostring(lineup[2]).."\n "..tostring(lineup[3]))
     end
@@ -89,7 +89,6 @@ function love.update(dt)
         pipes:Update(dt)
         player:Update(dt)
         scroll_speed = scroll_speed + dt / 5
-        score = 0
     end
 
     if score > highscore then
@@ -102,6 +101,7 @@ function restart()
     player:Reset()
     pipes:Reset()
     scroll_speed = 50
+    score = 0
 end
 
 
