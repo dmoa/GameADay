@@ -22,13 +22,14 @@ lg.setDefaultFilter("nearest", "nearest", 1)
 lg.setLineStyle('rough')
 
 splash = require "libs/splash"
+require "libs/slam"
 
 function love.draw() splash:update() end
 splash:startSplashScreen("start_screen.png", "", 1500, 500, 0, {}, function()
 
 
 push = require "libs/push"
-game_width, game_height = 512, 512
+game_width, game_height = 128, 128
 window_width, window_height = 512, 512
 lw.setMode(window_width, window_height, {borderless = false})
 push:setupScreen(game_width, game_height, window_width, window_height, {fullscreen = false, resizable = true, borderless = false})
@@ -43,10 +44,31 @@ screen:setDimensions(push:getDimensions())
 
 
 
+tiles = lg.newImage("tiles.png")
+quad = lg.newQuad(0, 0, 16, 16, tiles:getWidth(), tiles:getHeight())
+objects = {}
+
+local lines = love.filesystem.lines("1.txt")
+
+for line in lines do
+    table.insert(objects, {})
+    for x = 1, #line do
+        local c = line:sub(x,x)
+        table.insert(objects[#objects], c)
+    end
+end
 
 function love.draw()
     screen:apply()
     push:start()
+
+    for y = 1, #objects do
+        for x = 1, #(objects[y]) do
+            if objects[y][x] == "#" then
+                lg.draw(tiles, quad, (x - 1) * 16, (y - 1) * 16)
+            end
+        end
+    end
 
     push:finish()
 end
