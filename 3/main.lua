@@ -20,8 +20,8 @@ lw = love.window
 
 lg.setDefaultFilter("nearest", "nearest", 1)
 lg.setLineStyle('rough')
-lg.setBackgroundColor(1.0, 1.0, 1.0)
-love.mouse.setGrabbed(true)
+-- love.mouse.setGrabbed(true)
+love.mouse.setRelativeMode(true)
 
 splash = require "libs/splash"
 
@@ -53,8 +53,8 @@ end
 
 
 player = require "Player"
-_oldX = game_width / 2
-_oldY = game_height / 2
+xmoved = 0
+ymoved = 0
 lmouse.setPosition(lg.getWidth() / 2, lg.getHeight() / 2)
 
 random_x = lm.random(0, game_width - 1) * player.square_length
@@ -63,6 +63,9 @@ random_y = lm.random(0, game_width - 1) * player.square_length
 function love.draw()
     screen:apply()
     push:start()
+    lg.setColor(0.5, 0.5, 0.5)
+    lg.rectangle("fill", 0, 0, game_width, game_height)
+    lg.setColor(1.0, 1.0, 1.0)
 
     player:Draw()
     lg.setColor(0.0, 1.0, 0.0)
@@ -91,22 +94,25 @@ function love.resize(w, h)
   lg.clear()
 end
 
-function love.mousemoved()
-    local _x, _y = push:toGame(lmouse.getX(), lmouse.getY())
-    _x, _y = math.floor(_x), math.floor(_y)
+function love.mousemoved(_x, _y, dx, dy)
+    xmoved = xmoved + dx / push._SCALE.x
+    ymoved = ymoved + dy / push._SCALE.y
 
-    if (_x ~= _oldX) or (_y ~= _oldY) then
-        if #player.shapes > 0 and math.abs(_x - _oldX) > player.square_length or math.abs(_y - _oldY) > player.square_length then
-            -- x, y = push:toReal(player.shapes[#player.shapes].x + player.square_length / 2, player.shapes[#player.shapes].y + player.square_length / 2)
-            -- print(_oldX, _oldY, x, y)
-            -- lmouse.setPosition(x, y)
-        else
-            player:AddToQueue({x = _x, y = _y, oldX = _oldX, oldY = _oldY})
-        end
+
+    -- xmoved ymoved reset in AddToQueue
+
+    local s = player.shapes[#player.shapes]
+
+    if xmoved > 1 and s.x ~= (game_width - player.square_length) then
+        player:AddToQueue({x = s.x + player.square_length, y = s.y})
+    elseif xmoved < -1 and s.x ~= 0 and xmoved < ymoved then
+        player:AddToQueue({x = s.x - player.square_length, y = s.y})
+    elseif ymoved > 1 and s.y ~= (game_height - player.square_length) and ymoved > xmoved then
+        player:AddToQueue({x = s.x, y = s.y + player.square_length})
+    elseif ymoved < -1 and s.y ~= 0 and ymoved < xmoved then
+        player:AddToQueue({x = s.x, y = s.y - player.square_length})
     end
 
-    _oldX, _oldY = push:toGame(lmouse.getX(), lmouse.getY())
-    _oldX, _oldY = math.floor(_oldX), math.floor(_oldY)
 end
 
 end)
