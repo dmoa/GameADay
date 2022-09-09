@@ -29,8 +29,8 @@ splash:startSplashScreen("start_screen.png", "", 1500, 500, 0, {}, function()
 
 
 push = require "libs/push"
-game_width, game_height = 128, 128
-window_width, window_height = 512, 512
+game_width, game_height = 9 * 16, 9 * 16
+window_width, window_height = 9 * 16 * 4, 9 * 16 * 4
 lw.setMode(window_width, window_height, {borderless = false})
 push:setupScreen(game_width, game_height, window_width, window_height, {fullscreen = false, resizable = true, borderless = false})
 
@@ -44,8 +44,14 @@ screen:setDimensions(push:getDimensions())
 
 
 
+player = require "Player"
+
 tiles = lg.newImage("tiles.png")
-quad = lg.newQuad(0, 0, 16, 16, tiles:getWidth(), tiles:getHeight())
+quads = {}
+for i = 1, 5 do
+    table.insert(quads, lg.newQuad((i - 1) * 16, 0, 16, 16, tiles:getWidth(), tiles:getHeight()))
+end
+
 objects = {}
 
 local lines = love.filesystem.lines("1.txt")
@@ -53,8 +59,15 @@ local lines = love.filesystem.lines("1.txt")
 for line in lines do
     table.insert(objects, {})
     for x = 1, #line do
-        local c = line:sub(x,x)
-        table.insert(objects[#objects], c)
+
+        local value = line:sub(x,x)
+        if value == "#" then
+            value = love.math.random(1, 5)
+        else
+            value = 0
+        end
+
+        table.insert(objects[#objects], value)
     end
 end
 
@@ -64,17 +77,20 @@ function love.draw()
 
     for y = 1, #objects do
         for x = 1, #(objects[y]) do
-            if objects[y][x] == "#" then
-                lg.draw(tiles, quad, (x - 1) * 16, (y - 1) * 16)
+            if objects[y][x] <= 5 and objects[y][x] >= 1 then
+                lg.draw(tiles, quads[objects[y][x]], (x - 1) * 16, (y - 1) * 16)
             end
         end
     end
+
+    player:Draw()
 
     push:finish()
 end
 
 function love.update(dt)
     screen:update(dt)
+    player:Update(dt)
 end
 
 function love.keypressed(key)
